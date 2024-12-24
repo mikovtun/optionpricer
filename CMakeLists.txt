@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.18)
-project(cool LANGUAGES CXX CUDA)
+project(optionpricer LANGUAGES CXX CUDA)
 
 find_package(CUDAToolkit REQUIRED)
 find_package(TBB REQUIRED)
@@ -12,7 +12,10 @@ set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 
 # Specify the source files
 set(SOURCES
-    src/main.cu
+    src/kern_gpu.cu
+    src/kern_cpu.cxx
+    src/option.cxx
+    src/main.cxx
 )
 
 # Add the executable

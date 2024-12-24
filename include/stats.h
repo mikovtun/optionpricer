@@ -1,4 +1,8 @@
+#pragma once
+#include <cmath>
+
 namespace OP {
+
   template <typename T>
   T mean(size_t N, T* ptr) {
     T accumulator = 0.0;

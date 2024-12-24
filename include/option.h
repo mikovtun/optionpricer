@@ -1,28 +1,21 @@
+#pragma once
+#include <stock.h>
+#include <memory>
+
 namespace OP {
 
-class Option {
-  protected:
-    Option() = default;
+class CallOption {
   public:
-    Stock* const underlying;
-    float strike, expiration;
+    std::shared_ptr<Stock> underlying;
+    double strike, expiration;
 
-    virtual ~Option() = default;
-
-    virtual float getPrice(float accuracy) = 0;
-};
-
-class CallOption : Option {
-  public:
     CallOption() = delete;
-    CallOption(Stock* const und, float st, float exp) : underlying(und), strike(st), expiration(exp) { };
+    CallOption(std::shared_ptr<Stock> und, double st, float exp) : 
+      underlying(und), strike(st), expiration(exp) { };
 
-    float getPrice(float accuracy) {
-      size_t superN = 1000;
-      
-      return 0.0;
-    }
 
+  double getPriceKern(size_t N, double* prices);
+  std::pair<double, double> getPrice(float accuracy = 100.0);
 
 };
 

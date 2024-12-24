@@ -1,4 +1,6 @@
-#pragma once
+#include <iostream>
+#include <random>
+
 #include <cuda_runtime.h>
 #include <curand_kernel.h>
 #include <stock.h>
@@ -8,17 +10,17 @@ namespace OP {
 
 
 // Generates log(a + b*norm_rand)
-__global__ void gen_prices(float* nums, size_t n, const float start, const float logMean, const float logStdDev, unsigned long seed) {
+__global__ void gen_prices(double* nums, size_t n, const double start, const double logMean, const double logStdDev, unsigned long seed) {
   size_t id = threadIdx.x + blockIdx.x * blockDim.x;
 
   if( id < n ) {
     curandState state;
     curand_init(seed, id, 0, &state);
-    nums[id] = curand_log_normal(&state, logMean, logStdDev);
+    nums[id] = start * curand_log_normal_double(&state, logMean, logStdDev);
   }
 }
 
-__global__ void sumReduce(float* input, float* output) {
+__global__ void sumReduce(double* input, float* output) {
   size_t id = 2*threadIdx.x;
   for( size_t stride = 1; stride <= blockDim.x; stride *= 2) {
     if( threadIdx.x % stride == 0 )
@@ -32,22 +34,21 @@ __global__ void sumReduce(float* input, float* output) {
 
 
 template <>
-float LogNormalStock<Device::gpu>::getPrice(float u) {
+double LogNormalStock<Device::gpu>::getPrice(float u) {
   std::cout << "test" << std::endl;
+  return 0.0;
 }
 
 template <>
-std::vector<float> LogNormalStock<Device::gpu>::getPrices(size_t N, float u) {
-  std::vector<float> prices(N);
+void LogNormalStock<Device::gpu>::getPrices(size_t N, double* out, float u) {
   std::random_device rd;
 
-  auto p = prices.data();
-  //const float vol2 = volatility*volatility;
-  //const float logMean = (bias - vol2*0.5)*u;
-  //const float logStdDev = vol2*u;
-  const float vol2 = volatility*volatility;
-  const float logMean = log(start) + bias * u - 0.5*vol2*u;
-  const float logStdDev = volatility*sqrt(u);
+  //const double vol2 = volatility*volatility;
+  //const double logMean = (bias - vol2*0.5)*u;
+  //const double logStdDev = vol2*u;
+  const double vol2 = volatility*volatility;
+  const double logMean = bias * u - 0.5*vol2*u;
+  const double logStdDev = volatility*sqrt(u);
 
   auto gpuInstance = GPUProperties::get();
   auto gpuProps = gpuInstance->getProperties();
@@ -56,15 +57,15 @@ std::vector<float> LogNormalStock<Device::gpu>::getPrices(size_t N, float u) {
   size_t blocksPerRun = (N + maxThreadsPerBlock - 1) / maxThreadsPerBlock;
   size_t freeMem = gpuInstance->getFreeMem();
 
-  float* p_dev;
-  cudaError_t error = cudaMalloc( &p_dev, N*sizeof(float));
+  double* p_dev;
+  cudaError_t error = cudaMalloc( &p_dev, N*sizeof(double));
 
   if( error != cudaSuccess) 
     std::cout << cudaGetErrorString(error) << std::endl;
   
   gen_prices<<<blocksPerRun, maxThreadsPerBlock>>>( p_dev, N, start, logMean, logStdDev, rd());
 
-  error = cudaMemcpy( p, p_dev, N*sizeof(float), cudaMemcpyDeviceToHost);
+  error = cudaMemcpy( out, p_dev, N*sizeof(double), cudaMemcpyDeviceToHost);
 
   if( error != cudaSuccess) 
     std::cout << cudaGetErrorString(error) << std::endl;
@@ -73,9 +74,6 @@ std::vector<float> LogNormalStock<Device::gpu>::getPrices(size_t N, float u) {
 
   if( error != cudaSuccess) 
     std::cout << cudaGetErrorString(error) << std::endl;
-  
-  
-  return prices;
   
 }
 
