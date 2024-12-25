@@ -44,8 +44,8 @@ namespace OP {
     std::shared_ptr<Stock> stockptr = std::make_shared<LogNormalStock<Device::cpu>>(goog_c);
     
     CallOption goog_option( stockptr, 60, 200 );
-    auto [optMean, optStd] = goog_option.getPrice(0.001);
-    std::cout << "option price: " << optMean << " (" << optStd << ")" << std::endl;
+    auto optMean = goog_option.getPrice(0.01);
+    std::cout << "option price: " << optMean  << std::endl;
 
 
     return 0;

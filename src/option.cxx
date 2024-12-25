@@ -5,45 +5,54 @@
 
 namespace OP {
   double CallOption::getPriceKern(size_t N, double* prices) {
+    double value = 0.0;
     for( size_t it = 0; it < N; it++ ) {
       const double tmp = prices[it];
       if( tmp > strike )
-        prices[it] = tmp - strike;
+        value += tmp - strike;
     }
+    value /= N;
+    return value;
   }
 
-
-  std::pair<double, double> CallOption::getPrice(float accuracy) {
-    double sampleStdDev = accuracy * 2.0;
-    double sampleMean   = -1.0;
+  // Calculates option price
+  // Gets stock prices until the last M mean option prices have a maximum diff of less than float accuracy
+  double CallOption::getPrice(float accuracy) {
+    double runningMeanDiff = 100.0;
+    double runningMean   = -1.0;
     
-    const size_t N = 100000;
-    size_t runMult = 0;
+    const size_t N = 1000000;
+    const size_t M = 100;
+    size_t MCounter = 0;
+    size_t counter = 0;
     std::vector<double> optionPrices(N);
-    size_t maxiter = 10000;
+    bool ready = false;
 
-    while( sampleStdDev > accuracy ) {
+    while( not ready ) {
       // Get stock price action
-      underlying->getPrices(N, optionPrices.data()+runMult*N, expiration);
+      underlying->getPrices(N, optionPrices.data(), expiration);
       // Get option value from that (destructively)
-      getPriceKern(N, optionPrices.data() + runMult*N);
-      // Get total sample mean
-      sampleMean =   mean(optionPrices.size(), optionPrices.data());
+      auto sampleMean = getPriceKern(N, optionPrices.data());
+      // Get total running mean and difference from last
+      runningMeanDiff = runningMean;
+      runningMean = ( (double)counter * N * runningMean + N * sampleMean ) / ((double)(counter + 1) * N);
+      runningMeanDiff = std::abs( runningMean - runningMeanDiff );
       
-      sampleStdDev = stddev(optionPrices.size(), optionPrices.data(), sampleMean) / sqrt(optionPrices.size());
+      counter++;
 
-      runMult++;
-      optionPrices.resize((runMult+1) * N);
+      // Exit if last M running mean diffs are below threshold
+      if( runningMeanDiff < accuracy )
+        MCounter++;
+      else
+        MCounter = 0;
 
-      std::cout << "iter " << runMult << std::endl;
-      std::cout << "mean " << sampleMean << std::endl;
-      std::cout << "std  " << sampleStdDev << std::endl;
-      if( runMult > maxiter ) {
-        std::cerr << "hit maxiter" << std::endl;
-        throw;
-      }
+      if( MCounter == M )
+        ready = true;
+      
+      std::cout << runningMean << " " << runningMeanDiff << std::endl;
+        
     }
-    return std::make_pair(sampleMean, sampleStdDev);
+    return runningMean; 
   }
 
 }

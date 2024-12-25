@@ -15,7 +15,7 @@ class CallOption {
 
 
   double getPriceKern(size_t N, double* prices);
-  std::pair<double, double> getPrice(float accuracy = 100.0);
+  double getPrice(float accuracy = 100.0);
 
 };
 
