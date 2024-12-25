@@ -13,14 +13,14 @@ namespace OP {
 
     GPUProperties* gpuProps = GPUProperties::get();
     
-    double avg = 100;
-    double bias = 0.0;
-    double std = 0.1;
+    float avg = 100;
+    float bias = 0.0;
+    float std = 0.1;
     size_t N = 10000000;
-    std::vector<double> vec_c(N);
-    std::vector<double> vec_g(N);
+    std::vector<float> vec_c(N);
+    std::vector<float> vec_g(N);
 
-    double time = 45;
+    float time = 45;
 
     std::cout << "=== CPU ===" << std::endl;
     auto goog_c = LogNormalStock<Device::cpu>( avg, bias, std);
@@ -42,9 +42,10 @@ namespace OP {
     
      
     std::shared_ptr<Stock> stockptr = std::make_shared<LogNormalStock<Device::cpu>>(goog_c);
-    
-    CallOption goog_option( stockptr, 60, 200 );
-    auto optMean = goog_option.getPrice(0.01);
+    OptionPosition blah( stockptr );
+    blah.buyCall(60, 100);
+    blah.buyPut(90, 100);
+    auto optMean = blah.getPrice(0.01);
     std::cout << "option price: " << optMean  << std::endl;
 
 

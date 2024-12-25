@@ -4,10 +4,10 @@
 #include <option.h>
 
 namespace OP {
-  double CallOption::getPriceKern(size_t N, double* prices) {
-    double value = 0.0;
+  float CallOption::getPriceKern(size_t N, const float* prices) {
+    float value = 0.0;
     for( size_t it = 0; it < N; it++ ) {
-      const double tmp = prices[it];
+      const float tmp = prices[it];
       if( tmp > strike )
         value += tmp - strike;
     }
@@ -15,29 +15,49 @@ namespace OP {
     return value;
   }
 
-  // Calculates option price
+  float PutOption::getPriceKern(size_t N, const float* prices) {
+    float value = 0.0;
+    for( size_t it = 0; it < N; it++ ) {
+      const float tmp = prices[it];
+      if( tmp < strike )
+        value += strike - tmp;
+    }
+    value /= N;
+    return value;
+  }
+
+  // Calculates option prices in position
   // Gets stock prices until the last M mean option prices have a maximum diff of less than float accuracy
-  double CallOption::getPrice(float accuracy) {
-    double runningMeanDiff = 100.0;
-    double runningMean   = -1.0;
+  float OptionPosition::getPrice(float accuracy) {
+    if( options.empty() ) {
+      std::cerr << "empty options pos" << std::endl;
+      throw;
+    }
+    float runningMeanDiff = 100.0;
+    float runningMean   = -1.0;
     
     const size_t N = 1000000;
     const size_t M = 100;
     size_t MCounter = 0;
     size_t counter = 0;
-    std::vector<double> optionPrices(N);
+    std::vector<float> stockPrices(N);
     bool ready = false;
 
     while( not ready ) {
       // Get stock price action
-      underlying->getPrices(N, optionPrices.data(), expiration);
-      // Get option value from that (destructively)
-      auto sampleMean = getPriceKern(N, optionPrices.data());
+      underlying->getPrices(N, stockPrices.data(), options[0]->expiration);
+      // Get option value from that
+      float sampleMean = 0.0;
+      for( std::shared_ptr<Option> o : options )
+        sampleMean += o->getPriceKern(N, stockPrices.data());
+      
+      // Get stock price value
+      sampleMean += mean(N, stockPrices.data()) * (float)stockPosition;
+
       // Get total running mean and difference from last
       runningMeanDiff = runningMean;
-      runningMean = ( (double)counter * N * runningMean + N * sampleMean ) / ((double)(counter + 1) * N);
+      runningMean = ( (float)counter * N * runningMean + N * sampleMean ) / ((float)(counter + 1) * N);
       runningMeanDiff = std::abs( runningMean - runningMeanDiff );
-      
       counter++;
 
       // Exit if last M running mean diffs are below threshold
@@ -48,11 +68,9 @@ namespace OP {
 
       if( MCounter == M )
         ready = true;
-      
       std::cout << runningMean << " " << runningMeanDiff << std::endl;
-        
     }
     return runningMean; 
   }
-
 }
+

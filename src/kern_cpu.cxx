@@ -11,18 +11,18 @@ namespace OP {
 
 
 template <>
-void LogNormalStock<Device::cpu>::getPrices(size_t N, double* out, float u) {
+void LogNormalStock<Device::cpu>::getPrices(size_t N, float* out, float u) {
   std::random_device rd;
   std::mt19937_64 gen(rd());
-  //double logMean = (bias - volatility*volatility/2.0)*u;
-  //double logStdDev = volatility*volatility*u;
-  const double vol2 = volatility*volatility;
-  const double logMean = bias * u - 0.5*vol2*u;
-  const double logStdDev = volatility*sqrt(u);
-  std::lognormal_distribution<double> dist(logMean, logStdDev);
+  //float logMean = (bias - volatility*volatility/2.0)*u;
+  //float logStdDev = volatility*volatility*u;
+  const float vol2 = volatility*volatility;
+  const float logMean = bias * u - 0.5*vol2*u;
+  const float logStdDev = volatility*sqrt(u);
+  std::lognormal_distribution<float> dist(logMean, logStdDev);
 
   std::for_each(std::execution::par, out, out+N,
-      [&](double& value) {
+      [&](float& value) {
         value = start*dist(gen);
       });
 }
