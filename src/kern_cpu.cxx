@@ -22,23 +22,27 @@ void LogNormalStock<Device::cpu>::getPrices(size_t N, float* out, float u) {
 
   //float logMean = (bias - volatility*volatility/2.0)*u;
   //float logStdDev = volatility*volatility*u;
-  const float vol2 = volatility*volatility;
-  const float logMean = bias * u - 0.5*vol2*u;
-  const float logStdDev = volatility*sqrt(u);
+  const double vol2 = volatility*volatility;
+  const double logMean = log(start) + bias * u - 0.5*vol2*u;
+  const double logStdDev = volatility*sqrt(u);
   std::lognormal_distribution<float> dist(logMean, logStdDev);
+
+  // Generate N random numbers
+  std::vector<size_t> rOut(2*N);
+  gen(rOut.begin(), rOut.end());
+
+  constexpr double two_pi = 2.0 * M_PI;
   
-
-
   for(size_t i(0); i < N; i++) {
-    //std::counter_based_engine<prf_t, 1> gen{{seed, i}};
-    //out[i] = dist(gen) * start;
-    out[i] = dist(gen) * start;
-  }
+    double normed1 = static_cast<double>(rOut[2*i]) / static_cast<double>(std::numeric_limits<size_t>::max());
+    double normed2 = static_cast<double>(rOut[2*i+1]) / static_cast<double>(std::numeric_limits<size_t>::max());
 
-  //std::for_each(std::execution::par, out, out+N,
-  //    [&](float& value) {
-  //      value = start*dist(gen);
-  //    });
+    // Box-Muller transform from [0,1] to gaussian
+    auto z    = std::sqrt( -2.0f * std::log(normed1)) 
+              * std::cos(two_pi * normed2);
+    // gaussian to log-norm
+    out[i] = std::exp( logMean + logStdDev * z);
+  }
 }
 
 
