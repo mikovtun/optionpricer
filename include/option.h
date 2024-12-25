@@ -42,7 +42,7 @@ class PutOption : public Option {
 class OptionPosition {
   public:
     std::shared_ptr<Stock> underlying;
-    size_t stockPosition = 0;
+    int stockPosition = 0;
 
     std::vector<std::shared_ptr<Option>> options;
 
@@ -51,12 +51,15 @@ class OptionPosition {
     OptionPosition(std::shared_ptr<Stock> und): underlying(und) {};
 
     float getPrice(float accuracy = 0.01);
-
-    void buyCall(float str, float exp) { 
+    
+    void addShares(int num) {
+      stockPosition = num;
+    }
+    void addCall(float str, float exp) { 
       std::shared_ptr<Option> op = std::make_shared<CallOption>( underlying, str, exp);
       options.emplace_back( op );
     }
-    void buyPut(float str, float exp) { 
+    void addPut(float str, float exp) { 
       std::shared_ptr<Option> op = std::make_shared<PutOption>( underlying, str, exp);
       options.emplace_back( op );
     }

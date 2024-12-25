@@ -29,15 +29,15 @@ namespace OP {
   // Calculates option prices in position
   // Gets stock prices until the last M mean option prices have a maximum diff of less than float accuracy
   float OptionPosition::getPrice(float accuracy) {
-    if( options.empty() ) {
-      std::cerr << "empty options pos" << std::endl;
-      throw;
-    }
+    float expiration = 100;
+    if( not options.empty() )
+      expiration = options[0]->expiration;
+
     float runningMeanDiff = 100.0;
     float runningMean   = -1.0;
     
     const size_t N = 1000000;
-    const size_t M = 100;
+    const size_t M = 20;
     size_t MCounter = 0;
     size_t counter = 0;
     std::vector<float> stockPrices(N);
@@ -45,7 +45,7 @@ namespace OP {
 
     while( not ready ) {
       // Get stock price action
-      underlying->getPrices(N, stockPrices.data(), options[0]->expiration);
+      underlying->getPrices(N, stockPrices.data(), expiration);
       // Get option value from that
       float sampleMean = 0.0;
       for( std::shared_ptr<Option> o : options )
@@ -57,7 +57,7 @@ namespace OP {
       // Get total running mean and difference from last
       runningMeanDiff = runningMean;
       runningMean = ( (float)counter * N * runningMean + N * sampleMean ) / ((float)(counter + 1) * N);
-      runningMeanDiff = std::abs( runningMean - runningMeanDiff );
+      runningMeanDiff = std::abs( (runningMean - runningMeanDiff) / runningMeanDiff );
       counter++;
 
       // Exit if last M running mean diffs are below threshold
