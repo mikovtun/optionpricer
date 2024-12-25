@@ -36,7 +36,7 @@ namespace OP {
     float runningMeanDiff = 100.0;
     float runningMean   = -1.0;
     
-    const size_t N = 1000000;
+    const size_t N = 100000;
     const size_t M = 20;
     size_t MCounter = 0;
     size_t counter = 0;

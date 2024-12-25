@@ -46,7 +46,7 @@ namespace OP {
     //blah.addCall(60, 100);
     //blah.addPut(140, 100);
     blah.addShares(100);
-    auto optMean = blah.getPrice(0.01);
+    auto optMean = blah.getPrice(0.001);
     std::cout << "option price: " << optMean  << std::endl;
 
 
