@@ -68,7 +68,8 @@ namespace OP {
 
       if( MCounter == M )
         ready = true;
-      std::cout << runningMean << " " << runningMeanDiff << std::endl;
+
+      std::cout << runningMean << std::endl;
     }
     return runningMean; 
   }
