@@ -45,5 +45,20 @@ void LogNormalStock<Device::cpu>::getPrices(size_t N, float* out, float u) {
 }
 
 
+template <>
+void LogNormalStockDividend<Device::cpu>::getPrices(size_t N, float* out, float u) {
+  LogNormalStock<Device::cpu>::getPrices(N, out, u);
+  for(size_t i(0); i < N; i++) {
+    out[i] *= std::exp( dividendRate * u );
+  }
+}
+
+template <>
+void LogNormalStockDividend<Device::gpu>::getPrices(size_t N, float* out, float u) {
+  LogNormalStock<Device::gpu>::getPrices(N, out, u);
+  for(size_t i(0); i < N; i++) {
+    out[i] *= std::exp( dividendRate * u );
+  }
+}
 
 }

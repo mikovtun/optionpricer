@@ -29,6 +29,7 @@ namespace OP {
   // Calculates option prices in position
   // Gets stock prices until the last M mean option prices have a maximum diff of less than float accuracy
   float OptionPosition::getPrice(float accuracy) {
+    accuracy *= 0.10;
     float expiration = 100;
     if( not options.empty() )
       expiration = options[0]->expiration;

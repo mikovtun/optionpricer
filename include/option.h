@@ -63,5 +63,6 @@ class OptionPosition {
       std::shared_ptr<Option> op = std::make_shared<PutOption>( underlying, str, exp);
       options.emplace_back( op );
     }
+
 };
 }

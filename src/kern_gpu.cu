@@ -32,13 +32,6 @@ __global__ void sumReduce(float* input, float* output) {
 }
 
 
-
-template <>
-float LogNormalStock<Device::gpu>::getPrice(float u) {
-  std::cout << "test" << std::endl;
-  return 0.0;
-}
-
 template <>
 void LogNormalStock<Device::gpu>::getPrices(size_t N, float* out, float u) {
   std::random_device rd;

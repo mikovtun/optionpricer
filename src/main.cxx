@@ -13,19 +13,21 @@ namespace OP {
 
     GPUProperties* gpuProps = GPUProperties::get();
     
-    constexpr float tradingDaysInYear = 252;
-    float avg = 100;
+    //constexpr float tradingDaysInYear = 252;
+    constexpr float tradingDaysInYear = 365;
+    float avg = 30.16;
     float bias = 0.0;
-    float std = 10;
+    float std = 52;
+    float divvy = 0.10;
     size_t N = 1000000;
 
     std::vector<float> vec_c(N);
     std::vector<float> vec_g(N);
 
-    float time = 45;
+    float time = 56;
     
     //std::cout << "=== CPU ===" << std::endl;
-    auto goog_c = LogNormalStock<Device::cpu>( avg, bias, std / (100.0 * sqrt(tradingDaysInYear)));
+    auto goog_c = LogNormalStockDividend<Device::cpu>( avg, bias, std / (100.0 * sqrt(tradingDaysInYear)), divvy);
     std::cout << "tgt mean: " << avg << std::endl;
     std::cout << "tgt std:  " << std<< std::endl;
     
@@ -47,11 +49,22 @@ namespace OP {
      
     std::shared_ptr<Stock> stockptr = std::make_shared<LogNormalStock<Device::cpu>>(goog_c);
     OptionPosition blah( stockptr );
-    blah.addCall(100, 45);
-    //blah.addPut(140, 100);
+    blah.addCall(31, 57);
+    //blah.addPut(100, 365);
     //blah.addShares(100);
-    auto optMean = blah.getPrice(0.001);
-    std::cout << "option price: " << optMean << std::endl;
+    //
+    std::cout << "CALL VALUE: " << blah.getPrice(0.001) << std::endl;
+    
+    //float h = 0.1;
+    //float optAcc = 0.0001;
+    //stockptr->start -= h;
+    //auto optMeanMinusH = blah.getPrice(optAcc);
+    //stockptr->start += 2.0*h;
+    //auto optMeanPlusH = blah.getPrice(optAcc);
+    //stockptr->start -= h;
+    //auto delta = (optMeanPlusH - optMeanMinusH) / (2.0*h);
+    //std::cout << "option price: " << (optMeanPlusH + optMeanMinusH) / 2.0 << std::endl;
+    //std::cout << "delta: " << delta << std::endl;
 
 
     return 0;
