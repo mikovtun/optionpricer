@@ -15,26 +15,28 @@ namespace OP {
     
     //constexpr float tradingDaysInYear = 252;
     constexpr float tradingDaysInYear = 365;
-    float avg = 30.16;
+    float avg = 100;
     float bias = 0.0;
-    float std = 52;
-    float divvy = 0.10;
+    float std = 25;
     size_t N = 1000000;
+
+    float divvy_percent = 0.05;
+    float divvy_interval = 21;
+    float divvy_first_payment = 5;
 
     std::vector<float> vec_c(N);
     std::vector<float> vec_g(N);
 
-    float time = 56;
     
     //std::cout << "=== CPU ===" << std::endl;
-    auto goog_c = LogNormalStockDividend<Device::cpu>( avg, bias, std / (100.0 * sqrt(tradingDaysInYear)), divvy);
+    auto goog_c = LogNormalStockDividend<Device::cpu>( avg, bias, std / (100.0 * sqrt(tradingDaysInYear)), divvy_percent / tradingDaysInYear);
     std::cout << "tgt mean: " << avg << std::endl;
     std::cout << "tgt std:  " << std<< std::endl;
     
-    goog_c.getPrices(N, vec_c.data(), time);
-    auto meanval_c = mean(vec_c.size(), vec_c.data());
-    std::cout << "mean:   " <<  meanval_c << std::endl;
-    std::cout << "stddev: " << stddev(vec_c.size(), vec_c.data(), meanval_c) / sqrt(time/tradingDaysInYear) << std::endl;
+    //goog_c.getPrices(N, vec_c.data(), time);
+    //auto meanval_c = mean(vec_c.size(), vec_c.data());
+    //std::cout << "mean:   " <<  meanval_c << std::endl;
+    //std::cout << "stddev: " << stddev(vec_c.size(), vec_c.data(), meanval_c) / sqrt(time/tradingDaysInYear) << std::endl;
     
 
     //std::cout << "=== GPU ===" << std::endl;
@@ -47,13 +49,13 @@ namespace OP {
     //std::cout << "stddev: " << stddev(vec_g.size(), vec_g.data(), meanval_g) << std::endl;
     
      
-    std::shared_ptr<Stock> stockptr = std::make_shared<LogNormalStock<Device::cpu>>(goog_c);
+    std::shared_ptr<Stock> stockptr = std::make_shared<LogNormalStockDividend<Device::cpu>>(goog_c);
     OptionPosition blah( stockptr );
-    blah.addCall(31, 57);
+    blah.addCall(100, 45);
     //blah.addPut(100, 365);
     //blah.addShares(100);
     //
-    std::cout << "CALL VALUE: " << blah.getPrice(0.001) << std::endl;
+    std::cout << "CALL VALUE: " << blah.getPrice(0.01) << std::endl;
     
     //float h = 0.1;
     //float optAcc = 0.0001;

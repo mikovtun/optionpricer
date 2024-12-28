@@ -16,6 +16,7 @@ set(SOURCES
     src/kern_cpu.cxx
     src/option.cxx
     src/main.cxx
+    src/stock.cxx
 )
 
 

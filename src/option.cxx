@@ -38,7 +38,7 @@ namespace OP {
     float runningMean   = -1.0;
     
     const size_t N = 100000;
-    const size_t M = 20;
+    const size_t M = 10;
     size_t MCounter = 0;
     size_t counter = 0;
     std::vector<float> stockPrices(N);
@@ -70,7 +70,7 @@ namespace OP {
       if( MCounter == M )
         ready = true;
 
-      std::cout << runningMean << std::endl;
+      //std::cout << runningMean << std::endl;
     }
     return runningMean; 
   }

@@ -6,7 +6,6 @@
 #include <stats.h>
 #include <vector>
 
-
 #include "counter_based_engine.hpp"
 #include "philox_prf.hpp"
 namespace OP {
@@ -44,21 +43,29 @@ void LogNormalStock<Device::cpu>::getPrices(size_t N, float* out, float u) {
   }
 }
 
-
-template <>
-void LogNormalStockDividend<Device::cpu>::getPrices(size_t N, float* out, float u) {
-  LogNormalStock<Device::cpu>::getPrices(N, out, u);
+template <Device d>
+void LogNormalStockDividend<d>::getPrices(size_t N, float* out, float u) {
+  LogNormalStock<d>::getPrices(N, out, u);
   for(size_t i(0); i < N; i++) {
-    out[i] *= std::exp( dividendRate * u );
+    out[i] *= std::exp( -1.0 * dividendRate * u );
   }
 }
 
-template <>
-void LogNormalStockDividend<Device::gpu>::getPrices(size_t N, float* out, float u) {
-  LogNormalStock<Device::gpu>::getPrices(N, out, u);
-  for(size_t i(0); i < N; i++) {
-    out[i] *= std::exp( dividendRate * u );
+template <Device d>
+void LogNormalStockDiscreteDividend<d>::getPrices(size_t N, float* out, float u) {
+  LogNormalStock<d>::getPrices(N, out, u);
+  int numDividendsPaid = std::floor((u - daysTillFirstDividend) / dividendInterval);
+  if( numDividendsPaid > 0) {
+    for(size_t i(0); i < N; i++) {
+      out[i] *= std::pow(1.0 - dividendRate, numDividendsPaid);
+    }
   }
 }
+
+  template void LogNormalStockDividend<Device::cpu>::getPrices(size_t N, float* out, float u);
+  template void LogNormalStockDividend<Device::gpu>::getPrices(size_t N, float* out, float u);
+
+  template void LogNormalStockDiscreteDividend<Device::cpu>::getPrices(size_t N, float* out, float u);
+  template void LogNormalStockDiscreteDividend<Device::gpu>::getPrices(size_t N, float* out, float u);
 
 }
