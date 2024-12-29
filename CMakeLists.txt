@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.18)
 project(optionpricer LANGUAGES CXX CUDA)
+set(MODULE_NAME OP)
 
 find_package(CUDAToolkit REQUIRED)
 find_package(TBB REQUIRED)
@@ -18,46 +19,53 @@ set(SOURCES
     src/main.cxx
     src/stock.cxx
 )
-
-
-# Optional: Add compile definitions or options
-# For example, enable verbose compilation for CUDA
-# target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:--verbose>)
-
+# Add the executable
+add_executable(${PROJECT_NAME} ${SOURCES})
 
 set(CMAKE_BUILD_TYPE Debug)
 
 
-# Add the executable
-add_executable(${PROJECT_NAME} ${SOURCES})
-
-
-include(FetchContent)
-
-FetchContent_Declare(
-    cpp_counter_based_engine
-    GIT_REPOSITORY https://github.com/johnsalmon/cpp-counter-based-engine.git
-    GIT_TAG master  # Use the 'master' branch (or specify a different branch/tag/commit if needed)
-)
-
-FetchContent_MakeAvailable(cpp_counter_based_engine)
-
-target_include_directories(${PROJECT_NAME} PRIVATE include)
-target_include_directories(${PROJECT_NAME} PRIVATE ${cpp_counter_based_engine_SOURCE_DIR})
-
-
-
-
-
-
-
-# Link CUDA to the project
-target_link_libraries(${PROJECT_NAME} PRIVATE CUDA::cudart)
-# Link TBB
-target_link_libraries(${PROJECT_NAME} PRIVATE TBB::tbb)
-
-# Optional: Set specific CUDA properties
-# Enable a specific compute capability (e.g., 7.5 for Turing GPUs)
 set_target_properties(${PROJECT_NAME} PROPERTIES
     CUDA_ARCHITECTURES 75
 )
+
+target_include_directories(${PROJECT_NAME} PRIVATE include)
+
+# Find python
+find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
+
+include(FetchContent)
+
+# Get the counter-based RNG
+# This will become part of the standard for C++26
+FetchContent_Declare(
+    cpp_counter_based_engine
+    GIT_REPOSITORY https://github.com/johnsalmon/cpp-counter-based-engine.git
+    GIT_TAG master
+)
+FetchContent_MakeAvailable(cpp_counter_based_engine)
+
+# Get pybind11
+FetchContent_Declare(
+  pybind11
+  GIT_REPOSITORY https://github.com/pybind/pybind11.git
+  GIT_TAG        master
+)
+FetchContent_MakeAvailable(pybind11)
+
+# Includes
+target_include_directories(${PROJECT_NAME} PRIVATE ${cpp_counter_based_engine_SOURCE_DIR})
+target_include_directories(${PROJECT_NAME} PRIVATE ${pybind11_SOURCE_DIR}/include)
+target_include_directories(${PROJECT_NAME} PRIVATE ${Python3_INCLUDE_DIRS})
+
+
+
+# Links
+target_link_libraries(${PROJECT_NAME} PRIVATE CUDA::cudart)
+target_link_libraries(${PROJECT_NAME} PRIVATE TBB::tbb)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${Python3_LIBRARIES})
+
+
+### Create a Python module using pybind11
+#pybind11_add_module(${MODULE_NAME} src/main.cxx)
+
