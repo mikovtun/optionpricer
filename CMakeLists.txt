@@ -59,7 +59,6 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${pybind11_SOURCE_DIR}/includ
 target_include_directories(${PROJECT_NAME} PRIVATE ${Python3_INCLUDE_DIRS})
 
 
-
 # Links
 target_link_libraries(${PROJECT_NAME} PRIVATE CUDA::cudart)
 target_link_libraries(${PROJECT_NAME} PRIVATE TBB::tbb)
@@ -67,5 +66,16 @@ target_link_libraries(${PROJECT_NAME} PRIVATE ${Python3_LIBRARIES})
 
 
 ### Create a Python module using pybind11
-#pybind11_add_module(${MODULE_NAME} src/main.cxx)
+pybind11_add_module(${MODULE_NAME} src/python.cxx)
+
+target_include_directories(${MODULE_NAME} PRIVATE include)
+target_include_directories(${MODULE_NAME} PRIVATE ${cpp_counter_based_engine_SOURCE_DIR})
+target_include_directories(${MODULE_NAME} PRIVATE ${pybind11_SOURCE_DIR}/include)
+target_include_directories(${MODULE_NAME} PRIVATE ${Python3_INCLUDE_DIRS})
+
+
+# Links
+target_link_libraries(${MODULE_NAME} PRIVATE CUDA::cudart)
+target_link_libraries(${MODULE_NAME} PRIVATE TBB::tbb)
+target_link_libraries(${MODULE_NAME} PRIVATE ${Python3_LIBRARIES})
 
