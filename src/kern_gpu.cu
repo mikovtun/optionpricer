@@ -47,8 +47,8 @@ void LogNormalStock<Device::gpu>::getPrices(size_t N, float* out, float u) {
   auto gpuProps = gpuInstance->getProperties();
 
   size_t freeMem = gpuInstance->getFreeMem();
-  std::cout << "freeMem = " << freeMem << std::endl;
-  std::cout << "Can fit " << freeMem / sizeof(float) << " nums in memory" << std::endl;
+  //std::cout << "freeMem = " << freeMem << std::endl;
+  //std::cout << "Can fit " << freeMem / sizeof(float) << " nums in memory" << std::endl;
   //N = (size_t)(freeMem / sizeof(float) * 0.95);
 
   size_t maxThreadsPerBlock = gpuProps.maxThreadsPerBlock;

@@ -72,6 +72,28 @@ PYBIND11_MODULE(optionpricer, m) {
 
 	expose_LogNormalStockDiscreteDividend<Device::cpu>(m);
 	expose_LogNormalStockDiscreteDividend<Device::gpu>(m);
+
+
+  py::class_<OptionPosition>(m, "OptionPosition")
+    .def(py::init<std::shared_ptr<Stock>>())  
+    .def("getPrice", &OptionPosition::getPrice, py::arg("accuracy") = 0.01)
+    .def("longShares", &OptionPosition::longShares)  
+    .def("shortShares", &OptionPosition::shortShares)  
+    .def("setShares", &OptionPosition::setShares)  
+    .def("longCall", &OptionPosition::longCall)  
+    .def("longPut", &OptionPosition::longPut)  
+    .def("shortCall", &OptionPosition::shortCall)  
+    .def("shortPut", &OptionPosition::shortPut)  
+    .def_readwrite("underlying", &OptionPosition::underlying)  
+    .def_readwrite("stockPosition", &OptionPosition::stockPosition)  
+    .def_readwrite("options", &OptionPosition::options);  
+
+
+
+
+
+
+
 }
 
 }
