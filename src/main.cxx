@@ -53,7 +53,7 @@ namespace OP {
      
     std::shared_ptr<Stock> stockptr = std::make_shared<LogNormalStockDividend<Device::cpu>>(goog_c);
     OptionPosition blah( stockptr );
-    blah.addCall(100, 45);
+    blah.longCall(100, 45);
     //blah.addPut(100, 365);
     //blah.addShares(100);
     //

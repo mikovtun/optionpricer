@@ -12,7 +12,8 @@ namespace OP {
         value += tmp - strike;
     }
     value /= N;
-    return value;
+    if( isShort ) return -1.0*value;
+    else return value;
   }
 
   float PutOption::getPriceKern(size_t N, const float* prices) {
@@ -23,7 +24,8 @@ namespace OP {
         value += strike - tmp;
     }
     value /= N;
-    return value;
+    if( isShort ) return -1.0*value;
+    else return value;
   }
 
   // Calculates option prices in position
@@ -40,7 +42,7 @@ namespace OP {
     const size_t N = 100000;
     const size_t M = 10;
     size_t MCounter = 0;
-    size_t counter = 0;
+    size_t NCounter = 0;
     std::vector<float> stockPrices(N);
     bool ready = false;
 
@@ -57,9 +59,9 @@ namespace OP {
 
       // Get total running mean and difference from last
       runningMeanDiff = runningMean;
-      runningMean = ( (float)counter * N * runningMean + N * sampleMean ) / ((float)(counter + 1) * N);
+      runningMean = ( (float)NCounter * N * runningMean + N * sampleMean ) / ((float)(NCounter + 1) * N);
       runningMeanDiff = std::abs( (runningMean - runningMeanDiff) / runningMeanDiff );
-      counter++;
+      NCounter++;
 
       // Exit if last M running mean diffs are below threshold
       if( runningMeanDiff < accuracy )
@@ -70,7 +72,6 @@ namespace OP {
       if( MCounter == M )
         ready = true;
 
-      //std::cout << runningMean << std::endl;
     }
     return runningMean; 
   }

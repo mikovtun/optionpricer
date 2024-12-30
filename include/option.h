@@ -6,8 +6,11 @@ namespace OP {
 
 class Option {
   protected:
-    Option() = default;
+    Option(std::shared_ptr<Stock> und, float stk, float exp, bool shrt):
+        underlying(und), strike(stk), expiration(exp), isShort(shrt) { };
+    Option() = delete;
   public:
+    bool isShort = false;
     float strike, expiration;
     std::shared_ptr<Stock> underlying;
     // Non-destructively get option value from a list of realized stock prices
@@ -17,22 +20,14 @@ class Option {
 class CallOption : public Option {
   public:
     CallOption() = delete;
-    CallOption(std::shared_ptr<Stock> und, float st, float exp) {
-      this->underlying = und;
-      this->strike = st;
-      this->expiration = exp;
-    }
+    CallOption(std::shared_ptr<Stock> und, float st, float exp, bool sht): Option(und, st, exp, sht) {};
 
   float getPriceKern(size_t N, const float* prices) override;
 };
 class PutOption : public Option {
   public:
     PutOption() = delete;
-    PutOption(std::shared_ptr<Stock> und, float st, float exp) {
-      this->underlying = und;
-      this->strike = st;
-      this->expiration = exp;
-    }
+    PutOption(std::shared_ptr<Stock> und, float st, float exp, bool sht): Option(und, st, exp, sht) {};
 
   float getPriceKern(size_t N, const float* prices) override;
 };
@@ -52,17 +47,33 @@ class OptionPosition {
 
     float getPrice(float accuracy = 0.01);
     
-    void addShares(int num) {
+    void longShares(size_t num) {
+      stockPosition += num;
+    }
+    void shortShares(size_t num) {
+      stockPosition -= num;
+    }
+    void setShares(int num) {
       stockPosition = num;
     }
-    void addCall(float str, float exp) { 
-      std::shared_ptr<Option> op = std::make_shared<CallOption>( underlying, str, exp);
+
+    void longCall(float str, float exp) { 
+      std::shared_ptr<Option> op = std::make_shared<CallOption>( underlying, str, exp, false);
       options.emplace_back( op );
     }
-    void addPut(float str, float exp) { 
-      std::shared_ptr<Option> op = std::make_shared<PutOption>( underlying, str, exp);
+    void longPut(float str, float exp) { 
+      std::shared_ptr<Option> op = std::make_shared<PutOption>( underlying, str, exp, false);
+      options.emplace_back( op );
+    }
+    void shortCall(float str, float exp) { 
+      std::shared_ptr<Option> op = std::make_shared<CallOption>( underlying, str, exp, true);
+      options.emplace_back( op );
+    }
+    void shortPut(float str, float exp) { 
+      std::shared_ptr<Option> op = std::make_shared<PutOption>( underlying, str, exp, true);
       options.emplace_back( op );
     }
 
 };
+
 }
