@@ -1,6 +1,7 @@
 #pragma once
 #include <stock.h>
 #include <memory>
+#include <iostream>
 
 namespace OP {
 
@@ -43,7 +44,13 @@ class OptionPosition {
 
 
     OptionPosition() = delete;
-    OptionPosition(std::shared_ptr<Stock> und): underlying(und) {};
+    OptionPosition(std::shared_ptr<Stock> und) {
+      if( !und ) {
+        std::cerr << "OptionPosition: Received nullptr stock" << std::endl;
+        throw;
+      }
+      this->underlying = std::move(und);
+    }
 
     float getPrice(float accuracy = 0.01);
     

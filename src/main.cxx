@@ -70,6 +70,8 @@ namespace OP {
     std::cout << "CALL VALUE (LN DIV) GPU: " << g_opt_ln_div.getPrice(accuracy) << std::endl;
     std::cout << "CALL VALUE (LN DISC DIV) CPU: " << c_opt_ln_disc_div.getPrice(accuracy) << std::endl;
     std::cout << "CALL VALUE (LN DISC DIV) GPU: " << g_opt_ln_disc_div.getPrice(accuracy) << std::endl;
+
+    auto testptr = c_stock_ln.pointer();
     
     return 0;
   }

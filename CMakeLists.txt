@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.18)
-project(optionpricer LANGUAGES CXX CUDA)
-set(MODULE_NAME OP)
+project(OptionPricer LANGUAGES CXX CUDA)
+set(MODULE_NAME optionpricer)
 
 find_package(CUDAToolkit REQUIRED)
 find_package(TBB REQUIRED)
@@ -18,6 +18,7 @@ set(SOURCES
     src/option.cxx
     src/main.cxx
     src/stock.cxx
+    src/python.cxx
 )
 # Add the executable
 add_executable(${PROJECT_NAME} ${SOURCES})
@@ -66,7 +67,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE ${Python3_LIBRARIES})
 
 
 ### Create a Python module using pybind11
-pybind11_add_module(${MODULE_NAME} src/python.cxx)
+pybind11_add_module(${MODULE_NAME} ${SOURCES})
+
 
 target_include_directories(${MODULE_NAME} PRIVATE include)
 target_include_directories(${MODULE_NAME} PRIVATE ${cpp_counter_based_engine_SOURCE_DIR})
@@ -78,4 +80,5 @@ target_include_directories(${MODULE_NAME} PRIVATE ${Python3_INCLUDE_DIRS})
 target_link_libraries(${MODULE_NAME} PRIVATE CUDA::cudart)
 target_link_libraries(${MODULE_NAME} PRIVATE TBB::tbb)
 target_link_libraries(${MODULE_NAME} PRIVATE ${Python3_LIBRARIES})
+
 

@@ -14,13 +14,14 @@ namespace OP {
   {Device::gpu, "_gpu"}
 };
 
+
 // Templated helper function to expose LogNormalStock
 template <Device d>
 void expose_LogNormalStock(py::module_ &m) {
     std::string class_name = std::string("LogNormalStock") + DeviceNames.at(d);
-    py::class_<LogNormalStock<d>, Stock>(m, class_name.c_str())
+    py::class_<LogNormalStock<d>, Stock, std::shared_ptr<LogNormalStock<d>>>(m, class_name.c_str())
         .def(py::init<float, float, float>())  
-        .def("getPrices", &LogNormalStock<d>::getPrices)  
+        .def("pointer", &LogNormalStock<d>::pointer,                      py::return_value_policy::reference)  
         .def_readwrite("bias", &LogNormalStock<d>::bias)  
         .def_readwrite("volatility", &LogNormalStock<d>::volatility);  
 }
@@ -29,9 +30,9 @@ void expose_LogNormalStock(py::module_ &m) {
 template <Device d>
 void expose_LogNormalStockDividend(py::module_ &m) {
     std::string class_name = std::string("LogNormalStockDividend") + DeviceNames.at(d);
-    py::class_<LogNormalStockDividend<d>, Stock>(m, class_name.c_str())
+    py::class_<LogNormalStockDividend<d>, Stock, std::shared_ptr<LogNormalStockDividend<d>>>(m, class_name.c_str())
         .def(py::init<float, float, float, float>())  
-        .def("getPrices", &LogNormalStockDividend<d>::getPrices)  
+        .def("pointer", &LogNormalStockDividend<d>::pointer,                      py::return_value_policy::reference)  
 				.def_readwrite("dividendRate", &LogNormalStockDividend<d>::dividendRate);
 }
 
@@ -39,17 +40,13 @@ void expose_LogNormalStockDividend(py::module_ &m) {
 template <Device d>
 void expose_LogNormalStockDiscreteDividend(py::module_ &m) {
     std::string class_name = std::string("LogNormalStockDiscreteDividend") + DeviceNames.at(d);
-    py::class_<LogNormalStockDiscreteDividend<d>, Stock>(m, class_name.c_str())
+    py::class_<LogNormalStockDiscreteDividend<d>, Stock, std::shared_ptr<LogNormalStockDiscreteDividend<d>>>(m, class_name.c_str())
         .def(py::init<float, float, float, float, float, float>())  
-        .def("getPrices", &LogNormalStockDiscreteDividend<d>::getPrices)  
+        .def("pointer", &LogNormalStockDiscreteDividend<d>::pointer,                      py::return_value_policy::reference)  
 				.def_readwrite("dividendRate", &LogNormalStockDiscreteDividend<d>::dividendRate)
 				.def_readwrite("daysTillFirstDividend", &LogNormalStockDiscreteDividend<d>::daysTillFirstDividend)
 				.def_readwrite("dividendInterval", &LogNormalStockDiscreteDividend<d>::dividendInterval);
 }
-
-
-
-
 
 
 
@@ -60,7 +57,7 @@ PYBIND11_MODULE(optionpricer, m) {
     .export_values();
 
 
-  py::class_<Stock>(m, "Stock")
+  py::class_<Stock, std::shared_ptr<Stock>>(m, "Stock")
     .def("getPrices", &Stock::getPrices)
     .def_readwrite("start", &Stock::start);
 
@@ -87,12 +84,6 @@ PYBIND11_MODULE(optionpricer, m) {
     .def_readwrite("underlying", &OptionPosition::underlying)  
     .def_readwrite("stockPosition", &OptionPosition::stockPosition)  
     .def_readwrite("options", &OptionPosition::options);  
-
-
-
-
-
-
 
 }
 
