@@ -33,7 +33,7 @@ __global__ void sumReduce(float* input, float* output) {
 
 
 template <>
-void LogNormalStock<Device::gpu>::getPrices(size_t N, float* out, float u) {
+void LN<Device::gpu>::getLNModelPrices(size_t N, float* out, float u, float start, float bias, float volatility) {
   std::random_device rd;
 
   //const float vol2 = volatility*volatility;

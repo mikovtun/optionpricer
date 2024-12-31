@@ -30,22 +30,22 @@ namespace OP {
     float accuracy = 0.01;
 
 
-    auto c_stock_ln = LogNormalStockDividend<Device::cpu>( avg, bias, std, divvy_percent );
-    auto c_stock_ln_div = LogNormalStockDividend<Device::cpu>( avg, bias, std, divvy_percent );
-    auto c_stock_ln_disc_div = LogNormalStockDiscreteDividend<Device::cpu>( avg, bias, std, divvy_percent, divvy_first_payment, divvy_interval);
+    auto c_stock_ln = LNDividend<Device::cpu>( avg, bias, std, divvy_percent );
+    auto c_stock_ln_div = LNDividend<Device::cpu>( avg, bias, std, divvy_percent );
+    auto c_stock_ln_disc_div = LNDiscreteDividend<Device::cpu>( avg, bias, std, divvy_percent, divvy_first_payment, divvy_interval);
 
     
-    auto g_stock_ln = LogNormalStockDividend<Device::gpu>( avg, bias, std , divvy_percent);
-    auto g_stock_ln_div = LogNormalStockDividend<Device::gpu>( avg, bias, std , divvy_percent);
-    auto g_stock_ln_disc_div = LogNormalStockDiscreteDividend<Device::gpu>( avg, bias, std, divvy_percent, divvy_first_payment, divvy_interval);
+    auto g_stock_ln = LNDividend<Device::gpu>( avg, bias, std , divvy_percent);
+    auto g_stock_ln_div = LNDividend<Device::gpu>( avg, bias, std , divvy_percent);
+    auto g_stock_ln_disc_div = LNDiscreteDividend<Device::gpu>( avg, bias, std, divvy_percent, divvy_first_payment, divvy_interval);
     
      
-    std::shared_ptr<Stock> c_stock_ln_ptr           = std::make_shared<LogNormalStock<Device::cpu>>(c_stock_ln);
-    std::shared_ptr<Stock> c_stock_ln_div_ptr       = std::make_shared<LogNormalStockDividend<Device::cpu>>(c_stock_ln_div);
-    std::shared_ptr<Stock> c_stock_ln_disc_div_ptr  = std::make_shared<LogNormalStockDiscreteDividend<Device::cpu>>(c_stock_ln_disc_div);
-    std::shared_ptr<Stock> g_stock_ln_ptr           = std::make_shared<LogNormalStock<Device::gpu>>(g_stock_ln);
-    std::shared_ptr<Stock> g_stock_ln_div_ptr       = std::make_shared<LogNormalStockDividend<Device::gpu>>(g_stock_ln_div);
-    std::shared_ptr<Stock> g_stock_ln_disc_div_ptr  = std::make_shared<LogNormalStockDiscreteDividend<Device::gpu>>(g_stock_ln_disc_div);
+    std::shared_ptr<Stock> c_stock_ln_ptr           = std::make_shared<LN<Device::cpu>>(c_stock_ln);
+    std::shared_ptr<Stock> c_stock_ln_div_ptr       = std::make_shared<LNDividend<Device::cpu>>(c_stock_ln_div);
+    std::shared_ptr<Stock> c_stock_ln_disc_div_ptr  = std::make_shared<LNDiscreteDividend<Device::cpu>>(c_stock_ln_disc_div);
+    std::shared_ptr<Stock> g_stock_ln_ptr           = std::make_shared<LN<Device::gpu>>(g_stock_ln);
+    std::shared_ptr<Stock> g_stock_ln_div_ptr       = std::make_shared<LNDividend<Device::gpu>>(g_stock_ln_div);
+    std::shared_ptr<Stock> g_stock_ln_disc_div_ptr  = std::make_shared<LNDiscreteDividend<Device::gpu>>(g_stock_ln_disc_div);
     
     OptionPosition c_opt_ln( c_stock_ln_ptr );
     OptionPosition c_opt_ln_div( c_stock_ln_div_ptr );
