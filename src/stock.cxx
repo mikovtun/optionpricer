@@ -10,8 +10,6 @@ namespace OP {
   template class LNDiscreteDividend<Device::gpu>;
 
 
-
-
   template <Device d>
   void LN<d>::getPrices(size_t N, float* out, float u) {
     LN<d>::getLNModelPrices(N, out, u, start, bias, volatility);
@@ -51,7 +49,7 @@ namespace OP {
       else                   nextTime = std::min(times[i], u);
       float thisU = nextTime - curTime;
       curTime = nextTime;
-      getLNModelPrices<d>(N, prices.data(), thisU, start, bias[i], volatility[i]);
+      LN<d>::getLNModelPrices(N, prices.data(), thisU, start, bias[i], volatility[i]);
       // Multiply old prices by new ones
       for(size_t n(0); n < N; n++ ) {
         prices[n] /= start;
@@ -65,4 +63,7 @@ namespace OP {
 
   template void LNDiscreteDividend<Device::cpu>::getPrices(size_t N, float* out, float u);
   template void LNDiscreteDividend<Device::gpu>::getPrices(size_t N, float* out, float u);
+
+  template void LNPiecewise<Device::cpu>::getPrices(size_t N, float* out, float u);
+  template void LNPiecewise<Device::gpu>::getPrices(size_t N, float* out, float u);
 }
