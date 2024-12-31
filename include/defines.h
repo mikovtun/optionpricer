@@ -1,0 +1,1 @@
+#define TRADING_DAYS_PER_ANNUM 365

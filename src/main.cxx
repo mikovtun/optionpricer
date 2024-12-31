@@ -5,17 +5,14 @@
 #include "stock.h"
 #include "option.h"
 
-#include <pybind11/pybind11.h>
-
 namespace OP {
 
   GPUProperties* GPUProperties::instance = nullptr;
+  constexpr float tradingDaysPerAnnum = 365;
 
   int main(int argc, char* argv[]) {
 
     GPUProperties* gpuProps = GPUProperties::get();
-    // Market info
-    constexpr float tradingDaysInYear = 365;
     
     // Stock info
     float avg = 100;
@@ -33,14 +30,14 @@ namespace OP {
     float accuracy = 0.01;
 
 
-    auto c_stock_ln = LogNormalStockDividend<Device::cpu>( avg, bias, std / (100.0 * sqrt(tradingDaysInYear)), divvy_percent / tradingDaysInYear);
-    auto c_stock_ln_div = LogNormalStockDividend<Device::cpu>( avg, bias, std / (100.0 * sqrt(tradingDaysInYear)), divvy_percent / tradingDaysInYear);
-    auto c_stock_ln_disc_div = LogNormalStockDiscreteDividend<Device::cpu>( avg, bias, std / (100.0 * sqrt(tradingDaysInYear)), divvy_percent / tradingDaysInYear, divvy_first_payment, divvy_interval);
+    auto c_stock_ln = LogNormalStockDividend<Device::cpu>( avg, bias, std, divvy_percent );
+    auto c_stock_ln_div = LogNormalStockDividend<Device::cpu>( avg, bias, std, divvy_percent );
+    auto c_stock_ln_disc_div = LogNormalStockDiscreteDividend<Device::cpu>( avg, bias, std, divvy_percent, divvy_first_payment, divvy_interval);
 
     
-    auto g_stock_ln = LogNormalStockDividend<Device::gpu>( avg, bias, std / (100.0 * sqrt(tradingDaysInYear)), divvy_percent / tradingDaysInYear);
-    auto g_stock_ln_div = LogNormalStockDividend<Device::gpu>( avg, bias, std / (100.0 * sqrt(tradingDaysInYear)), divvy_percent / tradingDaysInYear);
-    auto g_stock_ln_disc_div = LogNormalStockDiscreteDividend<Device::gpu>( avg, bias, std / (100.0 * sqrt(tradingDaysInYear)), divvy_percent / tradingDaysInYear, divvy_first_payment, divvy_interval);
+    auto g_stock_ln = LogNormalStockDividend<Device::gpu>( avg, bias, std , divvy_percent);
+    auto g_stock_ln_div = LogNormalStockDividend<Device::gpu>( avg, bias, std , divvy_percent);
+    auto g_stock_ln_disc_div = LogNormalStockDiscreteDividend<Device::gpu>( avg, bias, std, divvy_percent, divvy_first_payment, divvy_interval);
     
      
     std::shared_ptr<Stock> c_stock_ln_ptr           = std::make_shared<LogNormalStock<Device::cpu>>(c_stock_ln);

@@ -33,7 +33,7 @@ void expose_LogNormalStockDividend(py::module_ &m) {
     py::class_<LogNormalStockDividend<d>, Stock, std::shared_ptr<LogNormalStockDividend<d>>>(m, class_name.c_str())
         .def(py::init<float, float, float, float>())  
         .def("pointer", &LogNormalStockDividend<d>::pointer,                      py::return_value_policy::reference)  
-				.def_readwrite("dividendRate", &LogNormalStockDividend<d>::dividendRate);
+				.def_readwrite("dividendYield", &LogNormalStockDividend<d>::dividendYield);
 }
 
 // Templated helper function to expose LogNormalStockDiscreteDividend
@@ -43,7 +43,7 @@ void expose_LogNormalStockDiscreteDividend(py::module_ &m) {
     py::class_<LogNormalStockDiscreteDividend<d>, Stock, std::shared_ptr<LogNormalStockDiscreteDividend<d>>>(m, class_name.c_str())
         .def(py::init<float, float, float, float, float, float>())  
         .def("pointer", &LogNormalStockDiscreteDividend<d>::pointer,                      py::return_value_policy::reference)  
-				.def_readwrite("dividendRate", &LogNormalStockDiscreteDividend<d>::dividendRate)
+				.def_readwrite("dividendYield", &LogNormalStockDiscreteDividend<d>::dividendYield)
 				.def_readwrite("daysTillFirstDividend", &LogNormalStockDiscreteDividend<d>::daysTillFirstDividend)
 				.def_readwrite("dividendInterval", &LogNormalStockDiscreteDividend<d>::dividendInterval);
 }
