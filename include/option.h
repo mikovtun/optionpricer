@@ -42,17 +42,22 @@ class OptionPosition {
 
     std::vector<std::shared_ptr<Option>> options;
 
-
     OptionPosition() = delete;
-    OptionPosition(std::shared_ptr<Stock> und) {
+    OptionPosition(std::shared_ptr<Stock> und) { setUnderlying(und); }
+
+    void setUnderlying(std::shared_ptr<Stock> und) {
       if( !und ) {
         std::cerr << "OptionPosition: Received nullptr stock" << std::endl;
         throw;
       }
       this->underlying = std::move(und);
+      // Update options underlying too
+      for( auto o : options )
+        o->underlying = this->underlying;
     }
 
-    float getPrice(float accuracy = 0.01);
+
+    float getPrice(float accuracy = 0.01, float time = -1.0);
     
     void longShares(size_t num) {
       stockPosition += num;
@@ -79,6 +84,10 @@ class OptionPosition {
     void shortPut(float str, float exp) { 
       std::shared_ptr<Option> op = std::make_shared<PutOption>( underlying, str, exp, true);
       options.emplace_back( op );
+    }
+    void clear() {
+      stockPosition = 0;
+      options.clear();
     }
 
 };

@@ -89,9 +89,9 @@ namespace OP {
 
     std::cout << "CALL VALUE (LN PIECEWISE) CPU: " << c_opt_ln_piece.getPrice(accuracy) << std::endl;
     std::cout << "CALL VALUE (LN PIECEWISE) GPU: " << g_opt_ln_piece.getPrice(accuracy) << std::endl;
+    
 
-
-
+    
 
     std::cout << "RNG SPECTRAL PROPERTIES TEST" << std::endl;
     std::vector<size_t> explist = {2, 4, 5, 6, 7};

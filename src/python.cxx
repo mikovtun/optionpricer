@@ -1,4 +1,5 @@
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 #include <string>
 #include <map>
 #include "stock.h"
@@ -48,14 +49,21 @@ void expose_LNDiscreteDividend(py::module_ &m) {
 				.def_readwrite("dividendInterval", &LNDiscreteDividend<d>::dividendInterval);
 }
 
+// Templated helper function to expose LNPiecewise
+template <Device d>
+void expose_LNPiecewise(py::module_ &m) {
+    std::string class_name = std::string("LNPiecewise") + DeviceNames.at(d);
+    py::class_<LNPiecewise<d>, Stock, std::shared_ptr<LNPiecewise<d>>>(m, class_name.c_str())
+        .def(py::init<float, std::vector<float>, std::vector<float>, std::vector<float>>())  
+        .def("pointer", &LNPiecewise<d>::pointer,                      py::return_value_policy::reference)  
+        .def_readwrite("bias", &LNPiecewise<d>::bias)  
+        .def_readwrite("volatility", &LNPiecewise<d>::volatility)
+        .def_readwrite("times", &LNPiecewise<d>::times);  
+}
+
 
 
 PYBIND11_MODULE(optionpricer, m) {
-  py::enum_<Device>(m, "Device")
-    .value("cpu", Device::cpu)
-    .value("gpu", Device::gpu)
-    .export_values();
-
 
   py::class_<Stock, std::shared_ptr<Stock>>(m, "Stock")
     .def("getPrices", &Stock::getPrices)
@@ -70,10 +78,13 @@ PYBIND11_MODULE(optionpricer, m) {
 	expose_LNDiscreteDividend<Device::cpu>(m);
 	expose_LNDiscreteDividend<Device::gpu>(m);
 
+	expose_LNPiecewise<Device::cpu>(m);
+	expose_LNPiecewise<Device::gpu>(m);
+
 
   py::class_<OptionPosition>(m, "OptionPosition")
     .def(py::init<std::shared_ptr<Stock>>())  
-    .def("getPrice", &OptionPosition::getPrice, py::arg("accuracy") = 0.01)
+    .def("getPrice", &OptionPosition::getPrice, py::arg("accuracy") = 0.01, py::arg("time") = -1.0)
     .def("longShares", &OptionPosition::longShares)  
     .def("shortShares", &OptionPosition::shortShares)  
     .def("setShares", &OptionPosition::setShares)  
@@ -81,9 +92,9 @@ PYBIND11_MODULE(optionpricer, m) {
     .def("longPut", &OptionPosition::longPut)  
     .def("shortCall", &OptionPosition::shortCall)  
     .def("shortPut", &OptionPosition::shortPut)  
-    .def_readwrite("underlying", &OptionPosition::underlying)  
-    .def_readwrite("stockPosition", &OptionPosition::stockPosition)  
-    .def_readwrite("options", &OptionPosition::options);  
+    .def("clear", &OptionPosition::clear)  
+    .def("setUnderlying", &OptionPosition::setUnderlying)
+    .def_readwrite("stockPosition", &OptionPosition::stockPosition);
 
 }
 

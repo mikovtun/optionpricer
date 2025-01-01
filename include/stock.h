@@ -81,7 +81,7 @@ class LNPiecewise : public Stock {
     // Get N prices at time u (parallelized)
     virtual void getPrices(size_t N, float* out, float u) override;
     std::shared_ptr<Stock> pointer() {
-      return std::make_shared<LN>(*this);
+      return std::make_shared<LNPiecewise>(*this);
     }
 };
 
@@ -94,7 +94,7 @@ class LNDividend : public LN<d> {
     LNDividend(const LNDividend& ) = default;
     LNDividend(LNDividend&& ) = default;
     LNDividend(float s, float b, float v, float div):
-     dividendYield(div / TRADING_DAYS_PER_ANNUM), LN<d>(s,b,v) { };
+     dividendYield(div /(100.0 * TRADING_DAYS_PER_ANNUM)), LN<d>(s,b,v) { };
     
     // Get N prices at time u (parallelized)
     void getPrices(size_t N, float* out, float u) override;
@@ -113,7 +113,7 @@ class LNDiscreteDividend : public LN<d> {
     LNDiscreteDividend() = delete;
     LNDiscreteDividend(const LNDiscreteDividend& ) = default;
     LNDiscreteDividend(LNDiscreteDividend&& ) = default;
-    LNDiscreteDividend(float s, float b, float v, float divRate, float daysTillFirstDiv, float divInterval): dividendYield(divRate), daysTillFirstDividend(daysTillFirstDiv), dividendInterval(divInterval), 
+    LNDiscreteDividend(float s, float b, float v, float divRate, float daysTillFirstDiv, float divInterval): dividendYield(divRate/(100.0 * TRADING_DAYS_PER_ANNUM)), daysTillFirstDividend(daysTillFirstDiv), dividendInterval(divInterval), 
      LN<d>(s,b,v) { };
     
     // Get N prices at time u (parallelized)
