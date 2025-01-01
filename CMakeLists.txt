@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.18)
 project(OptionPricer LANGUAGES CXX CUDA)
-set(MODULE_NAME optionpricer)
+set(EXE_NAME    testsuite)    # name of the test executable
+set(MODULE_NAME optionpricer) # name of the python module
+
+
+set(CMAKE_BUILD_TYPE Release)
+
 
 find_package(CUDAToolkit REQUIRED)
 find_package(TBB REQUIRED)
@@ -21,16 +26,14 @@ set(SOURCES
     src/python.cxx
 )
 # Add the executable
-add_executable(${PROJECT_NAME} ${SOURCES})
+add_executable(${EXE_NAME} ${SOURCES})
 
-set(CMAKE_BUILD_TYPE Debug)
-
-
-set_target_properties(${PROJECT_NAME} PROPERTIES
+# Set to your CUDA_ARCHITECTURE
+set_target_properties(${EXE_NAME} PROPERTIES
     CUDA_ARCHITECTURES 75
 )
 
-target_include_directories(${PROJECT_NAME} PRIVATE include)
+target_include_directories(${EXE_NAME} PRIVATE include)
 
 # Find python
 find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
@@ -55,15 +58,15 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(pybind11)
 
 # Includes
-target_include_directories(${PROJECT_NAME} PRIVATE ${cpp_counter_based_engine_SOURCE_DIR})
-target_include_directories(${PROJECT_NAME} PRIVATE ${pybind11_SOURCE_DIR}/include)
-target_include_directories(${PROJECT_NAME} PRIVATE ${Python3_INCLUDE_DIRS})
+target_include_directories(${EXE_NAME} PRIVATE ${cpp_counter_based_engine_SOURCE_DIR})
+target_include_directories(${EXE_NAME} PRIVATE ${pybind11_SOURCE_DIR}/include)
+target_include_directories(${EXE_NAME} PRIVATE ${Python3_INCLUDE_DIRS})
 
 
 # Links
-target_link_libraries(${PROJECT_NAME} PRIVATE CUDA::cudart)
-target_link_libraries(${PROJECT_NAME} PRIVATE TBB::tbb)
-target_link_libraries(${PROJECT_NAME} PRIVATE ${Python3_LIBRARIES})
+target_link_libraries(${EXE_NAME} PRIVATE CUDA::cudart)
+target_link_libraries(${EXE_NAME} PRIVATE TBB::tbb)
+target_link_libraries(${EXE_NAME} PRIVATE ${Python3_LIBRARIES})
 
 
 ### Create a Python module using pybind11
