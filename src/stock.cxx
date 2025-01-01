@@ -17,7 +17,8 @@ namespace OP {
 
   template <Device d>
   void LNDividend<d>::getPrices(size_t N, float* out, float u) {
-    LN<d>::getPrices(N, out, u);
+    //LN<d>::getPrices(N, out, u);
+    LN<d>::getLNModelPrices(N, out, u, this->start, this->bias, this->volatility);
     for(size_t i(0); i < N; i++) {
       out[i] *= std::exp( -1.0 * dividendYield * u );
     }
@@ -45,7 +46,7 @@ namespace OP {
     for(size_t i(0); i < bias.size(); i++ ) {
       // Two times, current and next, crawling along
       float nextTime;
-      if( i == bias.size() ) nextTime = u;
+      if( i == bias.size() - 1) nextTime = u;
       else                   nextTime = std::min(times[i], u);
       float thisU = nextTime - curTime;
       curTime = nextTime;

@@ -31,10 +31,17 @@ namespace OP {
   // Calculates option prices in position
   // Gets stock prices until the last M mean option prices have a maximum diff of less than float accuracy
   float OptionPosition::getPrice(float accuracy) {
+    // Check if position has any stock/options in it
+    if( options.empty() and stockPosition == 0 )
+      return 0.0;
+
     accuracy *= 0.10;
-    float expiration = 100;
+    float expiration;
+    // TODO: calendar spreads
     if( not options.empty() )
       expiration = options[0]->expiration;
+    else
+      expiration = 100;
 
     float runningMeanDiff = 100.0;
     float runningMean   = -1.0;

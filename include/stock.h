@@ -60,8 +60,8 @@ class LNPiecewise : public Stock {
      bias(b), volatility(v), times(t) { 
        this->start = s;
        // Scale volatility
-       for( int i(0); i < v.size(); i++ )
-         v[i] /= 100.0 * std::sqrt(TRADING_DAYS_PER_ANNUM);
+       for( int i(0); i < volatility.size(); i++ )
+         volatility[i] /= 100.0 * std::sqrt(TRADING_DAYS_PER_ANNUM);
 
        // Check dimensions
       if( bias.size() != volatility.size() ) {
